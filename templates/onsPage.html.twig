@@ -1,43 +1,58 @@
 {# add stimulus controller for title? #}
-{% set _sc = pageController|default('render') %}
-<ons-page id="{{ block('pageId')|default('no-id') }}" {{ stimulus_controller(_sc) }}>
+{#{% set _sc = pageController|default(false) %}#}
 
-{#    <ons-toolbar>#}
-{#        <div class="left">#}
-{#            <ons-toolbar-button icon="md-face"></ons-toolbar-button>#}
-{#        </div>#}
-
-{#        <div class="center">Title</div>#}
-
-{#        <div class="right">#}
-{#            <ons-toolbar-button>-</ons-toolbar-button>#}
-{#            <ons-toolbar-button>+</ons-toolbar-button>#}
-{#        </div>#}
-{#    </ons-toolbar>#}
-
-    {% set toolbarContent = block('toolbar')|default(false) %}
-    {% if toolbarContent %}
-    <ons-toolbar>
-        {% block toolbar %}
-        <div class="left">
-            {# issue with font not loading if css loaded in app.js #}
-            <ons-back-button></ons-back-button>
-        </div>
-
-{#        <div class="center" {{ stimulus_target('app','page_title') }}>#}
-{#            {{ block('pageId') }} (page_title in {{ _self }}#}
-{#        </div>#}
-
-        {% endblock %}
-    </ons-toolbar>
+{% set pageId = block('pageId') is defined ? block('pageId') : false %}
+{% set tabId = block('tabId') is defined ? block('tabId') : false %}
+{% set _sc = block('pageController') is defined ? block('pageController') : false %}
+<ons-page id="{{ pageId ?: tabId }}" {{ _sc ? stimulus_controller(_sc) }}>
+    {% if false and pageId %}
+        <ons-toolbar>
+            <div class="center">Page {{ pageId }} title</div>
+            <div class="right">
+                <ons-toolbar-button>-</ons-toolbar-button>
+                <ons-toolbar-button>+</ons-toolbar-button>
+            </div>
+        </ons-toolbar>
     {% endif %}
 
-    <p>
-        This is the {{ _self }} page, served from twig.  {{ 'now'|date }}
-    </p>
+
+    {#    {% set toolbarContent = block('toolbar')|default(false) %} #}
+    {% if pageId %}
+        <ons-toolbar id="{{ pageId }}-toolbar">
+            {% block toolbar %}
+                <div class="left">
+                    <ons-back-button></ons-back-button>
+                </div>
+
+                <div class="left">
+                    <ons-toolbar-button icon="md-face"></ons-toolbar-button>
+                </div>
+
+                <div class="center" {{ stimulus_target('app','page_title') }}>
+                    {{ pageId }}
+                </div>
+                <div class="right">
+                    <ons-toolbar-button>-</ons-toolbar-button>
+                    <ons-toolbar-button>+</ons-toolbar-button>
+                </div>
+
+            {% endblock %}
+        </ons-toolbar>
+    {% endif %}
+
     <div class="content" {{ stimulus_target('app', 'content') }}>
+{#        <p>#}
+{#            This is the {{ _self }} page, served from twig. {{ 'now'|date }}.#}
+{#        </p>#}
+        <div>
+             <b>{{ pageId ? 'page ' ~ pageId }}</b>
+            <i>{{ tabId ? 'Tab '~ tabId }}</i>
+
+        </div>
         {% block body %}
         {% endblock %}
     </div>
 
 </ons-page>
+
+
